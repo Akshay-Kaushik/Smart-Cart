@@ -1,4 +1,4 @@
-package com.example.smartcart.;
+package com.example.smartcart;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
