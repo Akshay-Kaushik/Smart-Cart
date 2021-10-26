@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1012831181766",
+    "firebase_url": "https://smart-basket-4c4b0-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "smart-basket-4c4b0",
+    "storage_bucket": "smart-basket-4c4b0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012831181766:android:d8585dfa83937c4c9e30c7",
+        "android_client_info": {
+          "package_name": "com.example.smartcart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1012831181766-g31komcdcl8no1gposktptso593h1lpk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBu6d565RcyzGJYQh2nMp6C9KZsxhZp-rM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1012831181766-g31komcdcl8no1gposktptso593h1lpk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

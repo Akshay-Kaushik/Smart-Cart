@@ -21,14 +21,14 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="175dp"
-                android:background="@drawable/ic_launcher_background">
+                android:background="#66ff99">
 
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="409dp"
                     android:layout_height="147dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_launcher_background"
+                    android:src="#66ff99"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -64,7 +64,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView" />
+                    app:layout_constraintTop_toBottomOf="@+id/imageView"
+                    app:tabTextColor="@color/black"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
