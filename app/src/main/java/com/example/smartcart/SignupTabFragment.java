@@ -34,7 +34,7 @@ public class SignupTabFragment extends Fragment {
     private FirebaseAuth mAuth;
     // Write a message to the database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = database.getReference("users");
+    DatabaseReference myRef = database.getReference("Users");
     String full_name, password, phone_number, mail;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     String MobilePattern = "[0-9]{10}";
