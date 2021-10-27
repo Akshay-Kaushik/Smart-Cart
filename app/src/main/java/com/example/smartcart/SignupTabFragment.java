@@ -20,36 +20,41 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SignupTabFragment extends Fragment {
-    EditText firstname,lastname,email,phone,pass,confirm;
+    EditText firstname, lastname, email, phone, pass, confirm;
     Button signup;
-    float v=0;
-    private FirebaseFirestore db;
+    float v = 0;
     private FirebaseAuth mAuth;
-    String full_name,password,phone_number,mail;
+    // Write a message to the database
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("users");
+    String full_name, password, phone_number, mail;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     String MobilePattern = "[0-9]{10}";
+
     @Override
-    public View onCreateView(@org.jetbrains.annotations.NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        ViewGroup root =(ViewGroup) inflater.inflate(R.layout.signup_tab_fragment,container, false);
+    public View onCreateView(@org.jetbrains.annotations.NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.signup_tab_fragment, container, false);
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-        firstname=root.findViewById(R.id.firstname);
-        lastname=root.findViewById(R.id.lastname);
-        phone=root.findViewById(R.id.phone);
-        email=root.findViewById(R.id.email);
-        pass=root.findViewById(R.id.pass);
-        confirm=root.findViewById(R.id.confirm);
-        signup=root.findViewById(R.id.signup);
+        database = FirebaseDatabase.getInstance();
+        firstname = root.findViewById(R.id.firstname);
+        lastname = root.findViewById(R.id.lastname);
+        phone = root.findViewById(R.id.phone);
+        email = root.findViewById(R.id.email);
+        pass = root.findViewById(R.id.pass);
+        confirm = root.findViewById(R.id.confirm);
+        signup = root.findViewById(R.id.signup);
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validate()){
+                if (validate()) {
                     firebase_register();
                 }
             }
@@ -73,6 +78,7 @@ public class SignupTabFragment extends Fragment {
 
         return root;
     }
+
     public boolean validate() {
         full_name = firstname.getText().toString() + " " + lastname.getText().toString();
         phone_number = phone.getText().toString();
@@ -107,33 +113,31 @@ public class SignupTabFragment extends Fragment {
 
         return false;
     }
-    public void firebase_register()
-    {
+
+    public void firebase_register() {
         mAuth.createUserWithEmailAndPassword(mail, password)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Log.d("abc",mAuth.toString());
-                            Toast.makeText(getContext(), "Registered Successfully!", Toast.LENGTH_SHORT).show();
+                            Log.d("abc", mAuth.toString());
+                            Toast.makeText(getActivity(), "Registered Successfully!", Toast.LENGTH_SHORT).show();
                             store_info();
                             user.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Toast.makeText(getContext(), "Verification Email Sent !", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(), "Verification Email Sent !", Toast.LENGTH_LONG).show();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            Intent intent = new Intent(getContext(), MainActivity.class);
-                            startActivity(intent);
-                        }
-                        else {
-                            Toast.makeText(getContext(),"Email already registered or some error occurred!",
+
+                        } else {
+                            Toast.makeText(getActivity(), "Email already registered or some error occurred!",
                                     Toast.LENGTH_SHORT).show();
 
                         }
@@ -144,14 +148,11 @@ public class SignupTabFragment extends Fragment {
     }
 
 
+
     public void store_info() {
-        Map<String, Object> user = new HashMap<>();
-        user.put("FName", full_name);
-        user.put("Email", email);
-        user.put("Phone", phone_number);
-// Add a new document with a generated ID
-        db.collection("users")
-                .document(mAuth.getUid())
-                .set(user);
+        myRef.child(mAuth.getUid()).child("Full Name").setValue(full_name);
+        myRef.child(mAuth.getUid()).child("Email").setValue(mail);
+        myRef.child(mAuth.getUid()).child("Phone").setValue(phone_number);
+        myRef.child(mAuth.getUid()).child("Balance").setValue(0.0);
     }
 }
