@@ -19,7 +19,7 @@ import com.google.zxing.integration.android.IntentResult;
 public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder builder;
     private FirebaseAuth mAuth;
-    ImageButton QR,signout,cart;
+    ImageButton QR,signout,cart,add;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +28,14 @@ public class MainActivity extends AppCompatActivity {
         QR=findViewById(R.id.qr_scan);
         signout=findViewById(R.id.logout_imbtn);
         cart=findViewById(R.id.cart_imbtn);
+        add=findViewById(R.id.add_money_imbtn);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Balance.class);
+                startActivity(intent);
+            }
+        });
         cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
