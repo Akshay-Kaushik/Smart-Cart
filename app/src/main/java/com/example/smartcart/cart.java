@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,10 +41,11 @@ public class cart extends AppCompatActivity {
     String cart_linked;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Users");
+    DatabaseReference myRef_Product = database.getReference("Products");
     DatabaseReference Ref = database.getReference("Carts");
     ImageButton home, signout, add;
     TextView cost_text;
-
+    List<ModelClass> cartItemsList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,23 +139,65 @@ public class cart extends AppCompatActivity {
     }
 
     public void open_cart_from_link() {
-        Ref.child(cart_linked).getKey();
-//        Ref.child("CA101").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                // This method is called once with the initial value and again
-//                // whenever data at this location is updated.
-//                Map<String, String> value;
-//                value =(Map<String, String>)dataSnapshot.getValue();
-//                Log.d("TAG", "Value is: " + value);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError error) {
-//                // Failed to read value
-//                Log.w("TAG", "Failed to read value.", error.toException());
-//            }
-//        });
+        Ref.child("CA101").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                ArrayList<Map<String,String>> value;
+                value = (ArrayList<Map<String,String>>) dataSnapshot.getValue();
+                value.remove(0);
+                for(int i=0;i<value.size();i++){
+                    Log.d("TAG", "Value is: " + value.get(i));
+                }
+                insert_to_cart(value);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("TAG", "Failed to read value.", error.toException());
+            }
+        });
+    }
+    public void insert_to_cart(ArrayList<Map<String,String>> value) {
+        int size = value.size();
+        cartItemsList=new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            String category=value.get(i).get("Category").toString();
+            String ID=value.get(i).get("ID").toString();
+            myRef_Product.child(category).child(ID).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again
+                    // whenever data at this location is updated.
+                    Map<String,String> value = (Map<String, String>) dataSnapshot.getValue();
+                    Log.d("TAG", "Value is: " + value.get("comm"));
+                    cartItemsList.add(
+                            new ModelClass(
+                                    value.get("comm"),
+                                    value.get("qty"),
+                                    value.get("price")
+                            )
+                    );
+                    adapter = new Adapter(cartItemsList);
+                    recyclerView.setAdapter(adapter);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    Log.w("TAG", "Failed to read value.", error.toException());
+                }
+            });
+
+
+        }
+
+
+
     }
 
-}
+
+    }
