@@ -7,18 +7,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder builder;
     private FirebaseAuth mAuth;
+    String cart_id_linked;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Users");
     ImageButton QR,signout,cart,add;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,17 +124,10 @@ public class MainActivity extends AppCompatActivity {
                 requestCode,resultCode,data
         );
         if(intentResult.getContents() !=null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Result");
-            builder.setMessage(intentResult.getContents());
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int i) {
-                    dialog.dismiss();
-
-                }
-            });
-            builder.show();
+            cart_id_linked=intentResult.getContents();
+            Toast.makeText(getApplicationContext(),"Cart Linked Successfully", Toast.LENGTH_SHORT);
+            Log.d("Success",intentResult.getContents());
+            myRef.child(mAuth.getUid()).child("Cart Linked").setValue(cart_id_linked);
         }
         else{
             Toast.makeText(getApplicationContext(),"You did not scan anything", Toast.LENGTH_SHORT);

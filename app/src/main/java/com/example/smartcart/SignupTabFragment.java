@@ -154,5 +154,6 @@ public class SignupTabFragment extends Fragment {
         myRef.child(mAuth.getUid()).child("Email").setValue(mail);
         myRef.child(mAuth.getUid()).child("Phone").setValue(phone_number);
         myRef.child(mAuth.getUid()).child("Balance").setValue(0.0);
+        myRef.child(mAuth.getUid()).child("Cart Linked").setValue(0);
     }
 }

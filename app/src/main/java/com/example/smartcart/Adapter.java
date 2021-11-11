@@ -27,11 +27,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull Adapter.ViewHolder holder, int position) {
-        int resource=userList.get(position).getImageView();
         String product=userList.get(position).getProduct();
         String quantity=userList.get(position).getQuantity();
         String price=userList.get(position).getPrice();
-        holder.setData(resource,product,quantity,price);
+        holder.setData(product,quantity,price);
 
     }
 
@@ -42,20 +41,17 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private ImageView imageView;
         private TextView product_text, price_text, quantity_text;
 
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
-            imageView=itemView.findViewById(R.id.prod_image);
             product_text=itemView.findViewById(R.id.prod_name);
             quantity_text=itemView.findViewById(R.id.quantity);
             price_text=itemView.findViewById(R.id.Price);
         }
 
-        public void setData(int resource, String product, String quantity, String price) {
-            imageView.setImageResource(resource);
+        public void setData(String product, String quantity, String price) {
             product_text.setText(product);
             quantity_text.setText(quantity);
             price_text.setText(price);
