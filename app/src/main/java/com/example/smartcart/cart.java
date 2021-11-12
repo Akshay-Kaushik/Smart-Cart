@@ -44,13 +44,15 @@ public class cart extends AppCompatActivity {
     DatabaseReference myRef_Product = database.getReference("Products");
     DatabaseReference Ref = database.getReference("Carts");
     ImageButton home, signout, add;
-    TextView cost_text;
+    TextView cost_text,balance_text;
     List<ModelClass> cartItemsList;
+    Double Balance=0.0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
         cost_text = findViewById(R.id.cost);
+        balance_text=findViewById(R.id.balance);
         mAuth = FirebaseAuth.getInstance();
         fetch_data();
         initData();
@@ -135,6 +137,22 @@ public class cart extends AppCompatActivity {
                 Log.w("TAG", "Failed to read value.", error.toException());
             }
         });
+        myRef.child(mAuth.getUid()).child("Balance").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                Balance = Double.parseDouble(dataSnapshot.getValue(String.class));
+                balance_text.setText("Balance: "+Balance);
+//                Log.d("TAG", "Value is: " + cart_linked);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("TAG", "Failed to read value.", error.toException());
+            }
+        });
 
     }
 
@@ -174,6 +192,7 @@ public class cart extends AppCompatActivity {
                     // whenever data at this location is updated.
                     Map<String,String> value = (Map<String, String>) dataSnapshot.getValue();
                     Log.d("TAG", "Value is: " + value.get("comm"));
+                    Variables.price+=Double.parseDouble(value.get("price"));
                     cartItemsList.add(
                             new ModelClass(
                                     value.get("comm"),
@@ -183,6 +202,7 @@ public class cart extends AppCompatActivity {
                     );
                     adapter = new Adapter(cartItemsList);
                     recyclerView.setAdapter(adapter);
+                    cost_text.setText("Total Cost: "+String.valueOf(Variables.price));
                 }
 
                 @Override
