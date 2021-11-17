@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -46,6 +48,7 @@ public class cart extends AppCompatActivity {
     ImageButton home, signout, add;
     TextView cost_text,balance_text;
     List<ModelClass> cartItemsList;
+    Button pay;
     Double Balance=0.0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,7 @@ public class cart extends AppCompatActivity {
         setContentView(R.layout.activity_cart);
         cost_text = findViewById(R.id.cost);
         balance_text=findViewById(R.id.balance);
+        pay=findViewById(R.id.pay_btn);
         mAuth = FirebaseAuth.getInstance();
         fetch_data();
         initData();
@@ -62,6 +66,25 @@ public class cart extends AppCompatActivity {
         home = findViewById(R.id.home_imbtn);
         signout = findViewById(R.id.logout_imbtn);
         add = findViewById(R.id.add_money_imbtn);
+        pay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Variables.price<Variables.balance){
+                    Variables.balance-=Variables.price;
+                    Variables.price=0;
+                    cost_text.setText("Total Cost: "+String.valueOf(Variables.price));
+                    myRef.child(mAuth.getUid()).child("Balance").setValue(String.valueOf(Variables.balance));
+                    cartItemsList=new ArrayList<>();
+                    Ref.child(cart_linked).setValue(cartItemsList);
+                    Ref.child(cart_linked).child("0").child("Category").setValue("0");
+                    initData();
+                    initRecyclerView();
+                }
+                else{
+                    Toast.makeText(cart.this,"You do not have sufficient balance!", Toast.LENGTH_LONG);
+                }
+            }
+        });
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,7 +130,7 @@ public class cart extends AppCompatActivity {
 
     private void initData() {
         userList = new ArrayList<>();
-        open_cart_from_link();
+
         //   Log.d("ABC",cart_linked);
     }
 
@@ -119,16 +142,18 @@ public class cart extends AppCompatActivity {
         adapter = new Adapter(userList);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+
     }
 
     public void fetch_data() {
-        myRef.child(mAuth.getUid()).child("Cart Linked").addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child(mAuth.getUid()).child("Cart Linked").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 cart_linked = dataSnapshot.getValue(String.class);
                 Log.d("TAG", "Value is: " + cart_linked);
+                open_cart_from_link();
             }
 
             @Override
@@ -157,34 +182,38 @@ public class cart extends AppCompatActivity {
     }
 
     public void open_cart_from_link() {
-        Ref.child("CA101").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                ArrayList<Map<String,String>> value;
-                value = (ArrayList<Map<String,String>>) dataSnapshot.getValue();
-                value.remove(0);
-                for(int i=0;i<value.size();i++){
-                    Log.d("TAG", "Value is: " + value.get(i));
+            Ref.child(cart_linked).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again
+                    // whenever data at this location is updated.
+                    ArrayList<Map<String,String>> value;
+                    value = (ArrayList<Map<String,String>>) dataSnapshot.getValue();
+                    if(value!=null) {
+                        value.remove(0);
+                        for (int i = 0; i < value.size(); i++) {
+                            Log.d("TAG", "Value is: " + value.get(i));
+                        }
+                        insert_to_cart(value);
+                    }
+
                 }
-                insert_to_cart(value);
 
-            }
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    Log.w("TAG", "Failed to read value.", error.toException());
+                }
+            });
 
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("TAG", "Failed to read value.", error.toException());
-            }
-        });
     }
     public void insert_to_cart(ArrayList<Map<String,String>> value) {
         int size = value.size();
         cartItemsList=new ArrayList<>();
+        Variables.price=0;
         for (int i = 0; i < size; i++) {
-            String category=value.get(i).get("Category").toString();
-            String ID=value.get(i).get("ID").toString();
+            String category=value.get(i).get("Category");
+            String ID=value.get(i).get("ID");
             myRef_Product.child(category).child(ID).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

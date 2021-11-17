@@ -6,15 +6,27 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
+import com.google.errorprone.annotations.Var;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Balance extends AppCompatActivity {
     ImageButton home,signout,cart;
     AlertDialog.Builder builder;
     private FirebaseAuth mAuth;
+    Button button;
+    EditText amount;
+    TextView balance_field;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Users");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +34,22 @@ public class Balance extends AppCompatActivity {
         home=findViewById(R.id.home_imbtn);
         signout=findViewById(R.id.logout_imbtn);
         cart=findViewById(R.id.cart_imbtn);
+        amount=findViewById(R.id.amount_enter);
+        balance_field=findViewById(R.id.balance_text);
+        balance_field.setText("Current Balance: "+ Variables.balance);
         mAuth = FirebaseAuth.getInstance();
+        button=findViewById(R.id.button);//Add Money
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(amount.getText().toString()!=null){
+                    myRef.child(mAuth.getUid()).child("Balance").setValue(String.valueOf(Double.parseDouble(amount.getText().toString())+Variables.balance));
+                    Variables.balance+=Double.parseDouble(amount.getText().toString());
+                    balance_field.setText("Current Balance: "+ Variables.balance);
+                }
+
+            }
+        });
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
